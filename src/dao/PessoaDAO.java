@@ -37,8 +37,9 @@ public class PessoaDAO {
         } catch (SQLException e) {
             System.out.println("Erro ao cadastrar Pessoa.\n"
                                 + e.getMessage());
-        }
+        }//Fim do 'try catch'
     }//Fim do cadastroPessoaDAO
+    
     public ArrayList<Pessoa> getPessoas(){
         ArrayList<Pessoa> pessoas = new ArrayList<>();
         try {
@@ -51,15 +52,15 @@ public class PessoaDAO {
                 //lado do java |x| lado ao lado do banco
                 p.setIdPessoa(rs.getInt("idPessoa"));
                 p.setNome(rs.getString("nome"));
-                p.setCpf(rs.getString("nome"));
-                p.setEndereco(rs.getString("endereço"));
+                p.setCpf(rs.getString("cpf"));
+                p.setEndereco(rs.getString("endereco"));
                 p.setTelefone(rs.getString("telefone"));
                 pessoas.add(p);
             }
         } catch (SQLException e) {
             System.out.println("Erro ao listar pessoas.\n"
                             + e.getMessage());
-        }
+        }//Fim do 'try catch'
         return pessoas;
     }//Fim ArraList<Pessoa> getPessoas()
     
@@ -76,21 +77,21 @@ public class PessoaDAO {
                 //lado do java |x| lado ao lado do banco
                 p.setIdPessoa(rs.getInt("idPessoa"));
                 p.setNome(rs.getString("nome"));
-                p.setCpf(rs.getString("nome"));
-                p.setEndereco(rs.getString("endereço"));
+                p.setCpf(rs.getString("cpf"));
+                p.setEndereco(rs.getString("endereco"));
                 p.setTelefone(rs.getString("telefone"));
             }
         } catch (SQLException e) {
             System.out.println("Erro ao buscar o cpf.\n"
                             + e.getMessage());
-        }
+        }//Fim do 'try catch'
         return p;
-    }
+    }//Fim do getPessoaByDoc
+    
     public void atualizarPessoaDAO(Pessoa pVO){
         try {
             Connection con = Conexao.getConexao();
-            String sql = "update pessoas set nome = ?, endereco = ?, telefone = ?"
-                        + "where cpf = ?";
+            String sql = "update pessoas set nome = ?, endereco = ?, telefone = ? where cpf = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1,pVO.getNome());
             pst.setString(2,pVO.getEndereco());
@@ -100,19 +101,20 @@ public class PessoaDAO {
             
         } catch (SQLException e) {
             System.out.println("Erro ao atualizar Pessoa.\n"
-                       + e.getMessage());
-        }
-    }
+                            + e.getMessage());
+        }//Fim do 'try catch'
+    }//Fim do atualizarPessoaDAO
+    
     public void deletarPessoaDAO(String cpf){
         try {
             Connection con = Conexao.getConexao();
             String sql = "delete from pessoas where cpf = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, cpf);
-           pst.executeUpdate();
+            pst.executeUpdate();
         } catch (Exception e) {
             System.out.println("Erro ao deletar a Pessoa.\n"
-                        + e.getMessage());
-        }
-    }
+                            + e.getMessage());
+        }//Fim do 'try catch'
+    }//Fim do deletarPessoaDAO
 }//Fim da classe PessoaDAO

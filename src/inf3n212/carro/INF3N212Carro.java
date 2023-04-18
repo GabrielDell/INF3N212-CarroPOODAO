@@ -10,6 +10,8 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import model.Carro;
 import model.Pessoa;
+import servicos.PessoaServicos;
+import servicos.ServicosFactory;
 import util.Validadores;
 
 /**
@@ -133,6 +135,7 @@ public class INF3N212Carro {
 
     private static void cadastrarPessoa() {
         System.out.println("-- Cadastro de Pessoa --");
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
         int idPessoa;
         String nome;
         String cpf;
@@ -145,7 +148,7 @@ public class INF3N212Carro {
             cpf = leia.nextLine();
             tcpf = Validadores.isCPF(cpf);
             if (tcpf) {
-                if (cadPessoa.getPessoaCPF(cpf) != null) {
+                if (pessoaS.getPessoaByDoc(cpf).getCpf() != null) {
                     System.out.println("CPF já cadastrado!");
                     System.out.println("1 - Tentar novamente");
                     System.out.println("2 - Cancelar cadastro");
@@ -179,7 +182,8 @@ public class INF3N212Carro {
         telefone = leia.nextLine();
         idPessoa = cadPessoa.geraID();
         Pessoa p = new Pessoa(idPessoa, nome, cpf, endereco, telefone);
-        cadPessoa.addPessoa(p);
+        //cadPessoa.addPessoa(p);
+        pessoaS.cadastroPessoa(p);
         System.out.println(p.getNome() + " cadastro com sucesso!");
     }
 
@@ -259,6 +263,7 @@ public class INF3N212Carro {
     }
 
     private static void editarPessoa() {
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
         System.out.println("-- Editar Pessoa --");
         boolean isCPF;
         do {
@@ -266,10 +271,10 @@ public class INF3N212Carro {
             String cpf = leia.nextLine();
             isCPF = Validadores.isCPF(cpf);
             if (isCPF) {
-                Pessoa p = cadPessoa.getPessoaCPF(cpf);
-                if (p != null) {
+                Pessoa p = pessoaS.getPessoaByDoc(cpf);
+                if (p.getCpf() != null) {
                     do {
-                        System.out.println("Quais dados de " + p.getNome() + "deseja alterar?");
+                        System.out.println("Quais dados de " + p.getNome() + " deseja alterar?");
                         System.out.println("1 - Nome");
                         System.out.println("2 - Endereço");
                         System.out.println("3 - Telefone");
@@ -302,7 +307,9 @@ public class INF3N212Carro {
                         if (op < 0 || op > 4) {
                             System.out.println("Opção inválida, tente novamente!");
                         }
-
+                        if (op > 0 && op < 4) {
+                            pessoaS.atualizarPessoa(p);
+                        }
                     } while (isCPF);//Fim do segundo 'do while'
 
                 } else {
@@ -359,7 +366,7 @@ public class INF3N212Carro {
                             System.out.println("Tipo de Combustível alterado com sucesso para " + c.getCombustivel());
                         }
                         if (op == 4 || op == 5) {
-                           boolean isCPF;
+                            boolean isCPF;
                             do {
                                 System.out.println("Informe o novo proprietário: ");
                                 String cpf = leia.nextLine();
@@ -377,7 +384,7 @@ public class INF3N212Carro {
                                             isCPF = false;
                                             c.setProprietario(p);
                                         }
-                                    }else{
+                                    } else {
                                         System.out.println("CPF não encontrado!");
                                         System.out.println("1 - Cadastrar?");
                                         System.out.println("2 - Tentar novamente?");
@@ -393,7 +400,7 @@ public class INF3N212Carro {
                         if (op == 0) {
                             System.out.println("Edição cancelada pelo usuário!");
                             isPlaca = false;
-                        }      
+                        }
                         if (op < 0 || op > 5) {
                             System.out.println("Opção inválida pelo usuário, tente novamente!");
                         }
@@ -419,9 +426,15 @@ public class INF3N212Carro {
 
     private static void listarPessoa() {
         System.out.println("-- Listar Pessoa --");
-        for (Object pessoa : cadPessoa.getPessoas()) {
-            System.out.println(pessoa.toString());
-        }//Fim do 'for'
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
+        if (pessoaS.getPessoas().isEmpty()) {
+            System.out.println("Não tem Pessoas cadastradas no sistema!");
+        } else {
+            for (Pessoa pessoa : pessoaS.getPessoas()) {
+                System.out.println(pessoa.toString());
+            }//Fim do 'for'
+        }
+
     }//Fim do listarPessoa
 
     private static void listarCarro() {
@@ -432,6 +445,7 @@ public class INF3N212Carro {
     }//Fim do listarCarro
 
     private static void deletarPessoa() {
+        PessoaServicos pessoaS = ServicosFactory.getPessoaServicos();
         System.out.println("-- Deletar Pessoa --");
         boolean delCPF = false;
         do {
@@ -439,13 +453,13 @@ public class INF3N212Carro {
             String cpf = leia.nextLine();
             delCPF = Validadores.isCPF(cpf);
             if (delCPF) {
-                Pessoa p = cadPessoa.getPessoaCPF(cpf);
-                if (p != null) {
+                Pessoa p = pessoaS.getPessoaByDoc(cpf);
+                if (p.getCpf() != null) {
                     System.out.println("Deseja realmente deletar " + p.getNome() + "?");
                     System.out.print("1 - Sim | 2 - Não: ");
                     int op = leiaNumInt();
                     if (op == 1) {
-                        cadPessoa.removePessoa(p);
+                        pessoaS.deletarPessoa(cpf);
                         System.out.println("Pessoa deletada com sucesso!");
                         delCPF = false;
                     } else {
